@@ -9,6 +9,12 @@ error_aux = []
 max_base = 0
 list_id = []
 
+def appendId(token):
+    if( token[1] in list_id):
+        print(Fore.RED + "Token '" + str(token[1]) + "' already exists. Redeclaration in line: " + str(token[2]))
+        exit(1)
+    list_id.append(token[1])
+
 def update_max_base(base):
     global max_base
     if(max_base < base):
@@ -22,7 +28,7 @@ def var_decl():
     base = count_position
     update_max_base(base)
     if match("ID", isDecl=True) and var_decl1():
-        list_id.append(token_list[base][1])
+        appendId(token_list[base])
         return True
     else:
         count_position = base
@@ -52,11 +58,13 @@ def parm_types():
         return True
     else:
         count_position = base
-    if _type() and match("ID") and parm_types2():
+    if _type() and match("ID", isDecl=True) and parm_types2():
+        appendId(token_list[base + 1])
         return True
     else:
         count_position = base
-    if _type() and match("ID") and match("[") and match("]") and parm_types2():
+    if _type() and match("ID", isDecl=True) and match("[") and match("]") and parm_types2():
+        appendId(token_list[base + 1])
         return True
     else:
         count_position = base
@@ -199,7 +207,7 @@ def func2():
     global count_position
     base = count_position
     update_max_base(base)
-    if _type() and var_decl() and func3() and match(';'):
+    if _type() and var_decl() and func3() and match(';') and func2():
         return True
     else:
         count_position = base
@@ -210,7 +218,7 @@ def func3():
     global count_position
     base = count_position
     update_max_base(base)
-    if match(',') and var_decl():
+    if match(',') and var_decl() and func3():
         return True
     else:
         count_position = base
@@ -221,7 +229,7 @@ def func4():
     global count_position
     base = count_position
     update_max_base(base)
-    if stmt():
+    if stmt() and func2():
         return True
     else:
         count_position = base
